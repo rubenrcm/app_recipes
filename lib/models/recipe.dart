@@ -274,6 +274,85 @@ class Category {
 
 }
 
+class CartIngredient {
+
+	int _id;
+	double _qty;
+	String _qty_type;
+	String _name;
+	double _original_qty;
+	bool _add_cart; //bool
+	bool _done; //bool
+
+	CartIngredient(this._qty, this._qty_type, this._name, this._original_qty, this._add_cart, this._done);
+
+	CartIngredient.withId(this._id, this._qty, this._qty_type, this._name, this._original_qty, this._add_cart, this._done);
+
+	int get id => _id;
+
+	double get qty => _qty;
+
+	String get qty_type => _qty_type;
+
+	String get name => _name;
+
+	double get original_qty => _original_qty;
+
+	bool get add_cart => _add_cart;
+
+	bool get done => _done;
+
+	set qty(double newQuantity) {
+		this._qty = newQuantity;
+	}
+
+	set qty_type(String newQty_type) {
+		this._qty_type = newQty_type;
+	}
+
+	set name(String newName) {
+		this._name = newName;
+	}
+
+	set original_qty(double newQuantity) {
+		this._original_qty = newQuantity;
+	}
+
+	set add_cart(bool newAddCart) {
+		this._add_cart = newAddCart;
+	}
+
+	set done(bool newDone) {
+		this._done = newDone;
+	}
+
+	Map<String, dynamic> toMap() {
+
+		var map = Map<String, dynamic>();
+		if (id != null) {
+			map['id'] = _id;
+		}
+		map['qty'] = _qty;
+		map['qty_type'] = _qty_type;
+		map['name'] = _name;
+		map['original_qty'] = _original_qty;
+		map['add_cart'] = _add_cart ? 1 : 0;
+		map['done'] = _done ? 1 : 0;
+
+		return map;
+	}
+
+	CartIngredient.fromMapObject(Map<String, dynamic> map) {
+		this._id = map['id'];
+		this._qty = map['qty'];
+		this._qty_type = map['qty_type'];
+		this._name = map['name'];
+		this._original_qty = map['original_qty'];
+		this._add_cart = map['add_cart'] == 1;
+		this._done = map['done'] == 1;
+	}
+
+}
 
 
 

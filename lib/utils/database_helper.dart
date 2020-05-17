@@ -13,6 +13,7 @@ class DatabaseHelper {
 	String ingredientTable = 'ingredient_table';
 	String stepTable = 'step_table';
 	String categoryTable = 'category_table';
+	String cartTable = 'cart_table';
 
 	String colId = 'id';
 	String colTitle = 'title';
@@ -51,7 +52,12 @@ class DatabaseHelper {
 		String path = directory.path + 'recipes.db';
 
 		// Open/create the database at a given path
-		var recipesDatabase = await openDatabase(path, version: 1, onCreate: _createDb);
+		var recipesDatabase = await openDatabase(path,
+				version: 1,
+				onCreate: _createDb,
+				onUpgrade: null // Here we can compare the version installed with the new version and
+												// create the necessary things to match the new database
+		);
 		return recipesDatabase;
 	}
 
@@ -77,7 +83,10 @@ class DatabaseHelper {
 				'name TEXT, '
 				'color TEXT, icon TEXT)');
 
-		// We also create here the directory where the images will be stored
+		await db.execute('CREATE TABLE $cartTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, '
+				'qty REAL, qty_type TEXT, name TEXT, add_cart INTEGER, original_qty REAL, done INTEGER)');
+
+		// We also create here the directory where the images will be stored //Not used for now
 		Directory appDocDir = await getApplicationDocumentsDirectory();
 		new Directory(appDocDir.path+'/'+recipePhotosDir).create()
 				.then((Directory directory) {});
@@ -249,6 +258,42 @@ class DatabaseHelper {
 	Future<int> deleteCategory(int id) async {
 		var db = await this.database;
 		int result = await db.rawDelete('DELETE FROM $categoryTable WHERE $colId = $id');
+		return result;
+	}
+
+	// -- Cart Ingredients Operations --
+
+	Future<List<Map<String, dynamic>>> getCartMapList() async {
+		Database db = await this.database;
+		var result = await db.query(cartTable, orderBy: 'id ASC');
+		return result;
+	}
+
+	Future<List<CartIngredient>> getCartList() async {
+		var ingredientMapList = await getCartMapList();
+		int count = ingredientMapList.length;
+		List<CartIngredient> ingredientList = List<CartIngredient>();
+		for (int i = 0; i < count; i++) {
+			ingredientList.add(CartIngredient.fromMapObject(ingredientMapList[i]));
+		}
+		return ingredientList;
+	}
+
+	Future<int> insertCartIngredient(CartIngredient ingredient) async {
+		Database db = await this.database;
+		var result = await db.insert(cartTable, ingredient.toMap());
+		return result;
+	}
+
+	Future<int> updateCartIngredient(CartIngredient ingredient) async {
+		var db = await this.database;
+		var result = await db.update(cartTable, ingredient.toMap(), where: '$colId = ?', whereArgs: [ingredient.id]);
+		return result;
+	}
+
+	Future<int> deleteCartIngredient(int id) async {
+		var db = await this.database;
+		int result = await db.rawDelete('DELETE FROM $cartTable WHERE $colId = $id');
 		return result;
 	}
 
