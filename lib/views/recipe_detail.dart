@@ -5,10 +5,13 @@ import 'package:font_awesome_flutter/fa_icon.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:recipes/models/recipe.dart';
 import 'package:recipes/utils/database_helper.dart';
+import 'package:recipes/views/ingredient_list.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:recipes/views/recipe_detail_edit.dart';
 import 'package:recipes/models/menu_list.dart';
 import 'dart:io';
+
+import 'cart_list_from_recipe.dart';
 
 class RecipeDetail extends StatefulWidget {
 
@@ -248,6 +251,9 @@ class RecipeDetailState extends State<RecipeDetail> {
 		if(choice == 'borrar'){
 			_delete();
 		}
+		if(choice == 'Añadir al carrito'){
+			_create_cart();
+		}
 	}
 
 	void moveToLastScreen() {
@@ -266,6 +272,22 @@ class RecipeDetailState extends State<RecipeDetail> {
 			Fluttertoast.showToast(msg: 'Problema al borrar');
 		}
 	}
+
+	void _create_cart() {
+		List<CartIngredient> cartList = new List();
+
+		for (int i=0; i<ingredient_count; i++){
+			cartList.add(CartIngredient(ingredientList[i].quantity, ingredientList[i].qty_type, ingredientList[i].name, ingredientList[i].quantity, true, false));
+		}
+
+    navigateToEditCart(cartList);
+	}
+
+  void navigateToEditCart(List<CartIngredient> cartList) async {
+    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return CartListRecipe(cartList);
+    }));
+  }
 
 	void navigateToEdit(Recipe recipe, String title) async {
 		bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {

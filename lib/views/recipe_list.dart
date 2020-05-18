@@ -8,6 +8,7 @@ import 'package:recipes/views/recipe_detail.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:recipes/views/recipe_detail_edit.dart';
+import 'package:recipes/views/cart_list.dart';
 import 'recipe_row.dart';
 
 
@@ -80,7 +81,7 @@ class RecipeListState extends State<RecipeList> {
 									color: Colors.black26,
 								),
 								onPressed: () {
-									Fluttertoast.showToast(msg: 'Coming soon');
+									navigateToCart();
 								},
 							),
 
@@ -155,6 +156,15 @@ class RecipeListState extends State<RecipeList> {
 	  	updateListView();
 	  }
   }
+
+	void navigateToCart() async {
+		bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+			return CartList();
+		}));
+		if (result == true) {
+			updateListView();
+		}
+	}
 
 	void navigateToAddNew(Recipe recipe, String title) async {
 		bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
