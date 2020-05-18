@@ -61,12 +61,15 @@ class CartListState extends State<CartList> {
           ),
           body: getIngredientListView(),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: new FloatingActionButton.extended(
-            label: Text("Vaciar carrito"),
-            icon: FaIcon(FontAwesomeIcons.shoppingCart, size: 20,),
-            onPressed: () {
-              //_deleteCart();
-            },
+          floatingActionButton: Opacity(
+            opacity: ingredient_count > 0 ? 1 : 0, //Only visible if there is some element
+            child: FloatingActionButton.extended(
+              label: Text("Vaciar carrito"),
+              icon: FaIcon(FontAwesomeIcons.shoppingCart, size: 20,),
+              onPressed: () {
+                _deleteCart();
+              },
+            ),
           )
       ),
     );
@@ -78,8 +81,8 @@ class CartListState extends State<CartList> {
         child: Column(
           children: <Widget>[
             SizedBox(height: 26.0,),
-            Image.asset('assets/img/empty_ingredients_icon.png', scale: 4.0,),
-            Text("¡Añade ingredientes al carrito!", style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 20),)
+            Image.asset('assets/img/empty_cart_icon.png', scale: 4.0,),
+            Text("¡El carrito está vacío!", style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 20),)
           ],
         ),
       );
@@ -100,7 +103,7 @@ class CartListState extends State<CartList> {
                 new SizedBox(width:4),
                 new Text(this.ingredientList[position].qty_type ?? ' ', style: TextStyle(fontWeight: FontWeight.bold)),
                 new SizedBox(width:6),
-                new Text(this.ingredientList[position].name),
+                new Text(this.ingredientList[position].name ?? ' '),
               ],
             ),
             trailing: new IconButton(
@@ -239,18 +242,31 @@ class CartListState extends State<CartList> {
 
   void _saveCart() async {
     int result;
-
-    for (int i=0;i<ingredient_count;i++){
-      if (ingredientList[i].id == null){
-        result = await databaseHelper.insertCartIngredient(ingredientList[i]);
-      }
-      else {
-        result = await databaseHelper.updateCartIngredient(ingredientList[i]);
+    if (ingredient_count > 0) {
+      for (int i=0;i<ingredient_count;i++){
+        if (ingredientList[i].id == null){
+          result = await databaseHelper.insertCartIngredient(ingredientList[i]);
+        }
+        else {
+          result = await databaseHelper.updateCartIngredient(ingredientList[i]);
+        }
       }
     }
-
     if (result == 0) {
       Fluttertoast.showToast(msg: 'Problema al guardar');
+    }
+  }
+
+  void _deleteCart() async {
+    int result;
+    for (int i=0;i<ingredient_count;i++){
+      result = await databaseHelper.deleteCartIngredient(ingredientList[i].id);
+    }
+    if (result != 0) {
+      setState(() {
+        ingredientList = List<CartIngredient>();
+        ingredient_count = 0;
+      });
     }
   }
 
