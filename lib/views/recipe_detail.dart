@@ -5,7 +5,6 @@ import 'package:font_awesome_flutter/fa_icon.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:recipes/models/recipe.dart';
 import 'package:recipes/utils/database_helper.dart';
-import 'package:recipes/views/ingredient_list.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:recipes/views/recipe_detail_edit.dart';
 import 'package:recipes/models/menu_list.dart';
@@ -60,7 +59,7 @@ class RecipeDetailState extends State<RecipeDetail> {
 					 slivers: <Widget>[
 							SliverAppBar(
 								actionsIconTheme: IconThemeData(color:Colors.white),
-								expandedHeight: 200.0,
+								expandedHeight: 300.0,
 								floating: false,
 								pinned: true,
 								actions: <Widget>[
@@ -85,7 +84,13 @@ class RecipeDetailState extends State<RecipeDetail> {
 										background: Hero(
 											tag: "recipe-hero-${recipe.id}",
 											child: recipePhoto == null
-													? Image(image: AssetImage('assets/img/empty_photo.png'), fit: BoxFit.fill,)
+													? Stack(
+												alignment: Alignment.center,
+												children: <Widget>[
+													Container(height: MediaQuery.of(context).size.width, width: MediaQuery.of(context).size.width, color: Color(recipe.backColor),),
+													FaIcon(FontAwesomeIcons.utensils, size: 180, color: Color(0x88FFFFFF))
+												],
+											)
 													: Image.file(recipePhoto, fit: BoxFit.cover,)
 										),
 								),
@@ -276,8 +281,13 @@ class RecipeDetailState extends State<RecipeDetail> {
 	void _create_cart() {
 		List<CartIngredient> cartList = new List();
 
-		for (int i=0; i<ingredient_count; i++){
-			cartList.add(CartIngredient(ingredientList[i].quantity, ingredientList[i].qty_type, ingredientList[i].name, ingredientList[i].quantity, true, false));
+		if (ingredient_count > 0){
+			for (int i=0; i<ingredient_count; i++){
+				cartList.add(CartIngredient(ingredientList[i].quantity, ingredientList[i].qty_type, ingredientList[i].name, ingredientList[i].quantity, true, false));
+			}
+		}
+		else{
+			Fluttertoast.showToast(msg: '¡No hay ingredientes!');
 		}
 
     navigateToEditCart(cartList);

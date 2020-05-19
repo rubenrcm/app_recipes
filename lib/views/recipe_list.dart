@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:recipes/models/photo_colors.dart';
 import 'package:recipes/models/recipe.dart';
 import 'package:recipes/utils/database_helper.dart';
 import 'package:recipes/views/recipe_detail.dart';
@@ -10,6 +11,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:recipes/views/recipe_detail_edit.dart';
 import 'package:recipes/views/cart_list.dart';
 import 'recipe_row.dart';
+import "dart:math";
 
 
 class RecipeList extends StatefulWidget {
@@ -45,7 +47,7 @@ class RecipeListState extends State<RecipeList> {
 
 	    appBar: AppBar(
 				centerTitle: true,
-		    elevation: 2.0,
+		    elevation: 1.0,
 		    title: Text('Recetas',
 										style: TextStyle(fontFamily: 'Lobster',
 																			fontSize: 30),
@@ -110,7 +112,7 @@ class RecipeListState extends State<RecipeList> {
 			floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 	    floatingActionButton: FloatingActionButton(
 		    onPressed: () {
-					navigateToAddNew(Recipe('', '', Duration(minutes:30), 1, null, '', '', null), 'Nueva Receta');
+					navigateToAddNew(Recipe('', '', Duration(minutes:30), 1, null, '', '', null, PhotoColors.colors[new Random().nextInt(PhotoColors.colors.length)]), 'Nueva Receta');
 		    },
 		    tooltip: 'Añade una receta',
 		    child: FaIcon(FontAwesomeIcons.utensils, size: 20,),

@@ -109,7 +109,13 @@ class RecipeDetailState extends State<RecipeDetailEdit> {
 								ClipRRect(
 									borderRadius: BorderRadius.circular(16.0),
 									child: recipePhoto == null
-											? Image(image: AssetImage('assets/img/empty_photo.png'), fit: BoxFit.cover,)
+											? Stack(
+										alignment: Alignment.center,
+										children: <Widget>[
+											Container(height: MediaQuery.of(context).size.width, width: MediaQuery.of(context).size.width, color: Color(recipe.backColor),),
+											FaIcon(FontAwesomeIcons.utensils, size: 180, color: Color(0x88FFFFFF))
+										],
+									)
 											: Image.file(recipePhoto, fit: BoxFit.cover,)
 									,
 								),

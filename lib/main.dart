@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
 				primaryIconTheme: IconThemeData(color: Colors.white),
 				primaryTextTheme: TextTheme(
 					title: TextStyle(
-					color: Color(0xFFFBF5E8)
+					color: Color(0xFFFFFFFF)
 					),
 					body1: TextStyle(
 							fontSize: 16.0

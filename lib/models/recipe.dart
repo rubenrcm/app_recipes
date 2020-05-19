@@ -10,10 +10,11 @@ class Recipe {
 	String _source;
 	String _notes;
 	String _photo_path;
+	int _backColor;
 
-	Recipe(this._name, this._description, this._duration, this._servings, this._category_id, this._source, this._notes, this._photo_path);
+	Recipe(this._name, this._description, this._duration, this._servings, this._category_id, this._source, this._notes, this._photo_path, this._backColor);
 
-	Recipe.withId(this._id, this._name, this._description, this._duration, this._servings, this._category_id, this._source, this._notes, this._photo_path);
+	Recipe.withId(this._id, this._name, this._description, this._duration, this._servings, this._category_id, this._source, this._notes, this._photo_path, this._backColor);
 
 	int get id => _id;
 
@@ -32,6 +33,8 @@ class Recipe {
 	String get notes => _notes;
 
 	String get photo_path => _photo_path;
+
+	int get backColor => _backColor;
 
 	set id(int newId) {
 		this._id = newId;
@@ -73,6 +76,10 @@ class Recipe {
 		this._photo_path = newPath;
 	}
 
+	set backColor(int newBack) {
+		this._backColor = newBack;
+	}
+
 	Map<String, dynamic> toMap() {
 
 		var map = Map<String, dynamic>();
@@ -87,6 +94,7 @@ class Recipe {
 		map['source'] = _source;
 		map['notes'] = _notes;
 		map['photo_path'] = _photo_path;
+		map['background_color'] = _backColor;
 
 		return map;
 	}
@@ -101,6 +109,7 @@ class Recipe {
 		this._source = map['source'];
 		this. _notes = map['notes'];
 		this. _photo_path = map['photo_path'];
+		this. _backColor = map['background_color'];
 	}
 }
 

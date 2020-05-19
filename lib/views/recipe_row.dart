@@ -28,7 +28,7 @@ class RecipeRow extends StatelessWidget {
       height: 92.0,
       width: 92.0,
       decoration: new BoxDecoration(
-        color: Colors.white,
+        color: Color(recipe.backColor),
         borderRadius: new BorderRadius.circular(10.0),
         boxShadow: <BoxShadow>[
           new BoxShadow(
@@ -43,7 +43,9 @@ class RecipeRow extends StatelessWidget {
         child: new ClipRRect(
           borderRadius: BorderRadius.circular(10.0),
           child: recipe.photo_path == null
-              ? Image(image: AssetImage('assets/img/empty_photo.png'), fit: BoxFit.cover, height: 92.0, width: 92.0,)
+              ? Center(
+            child: FaIcon(FontAwesomeIcons.utensils, size: 55, color: Color(0x88FFFFFF)),
+          )
               : Image.file(File(recipe.photo_path), fit: BoxFit.cover, height: 92.0, width: 92.0,)
         ),
       )

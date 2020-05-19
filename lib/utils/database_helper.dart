@@ -65,7 +65,7 @@ class DatabaseHelper {
 
 		await db.execute('CREATE TABLE $recipeTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, '
 				'$colDescription TEXT, $colDuration INTEGER, $colDate TEXT, $colServings INTEGER, $colCategory INTEGER, '
-				'$colSource TEXT, $colNotes TEXT, $colPhoto TEXT,'
+				'$colSource TEXT, $colNotes TEXT, $colPhoto TEXT, background_color INTEGER, '
 				'FOREIGN KEY($colCategory) REFERENCES $categoryTable(id)'
 				'ON DELETE CASCADE)');
 
