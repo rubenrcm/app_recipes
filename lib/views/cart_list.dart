@@ -43,7 +43,7 @@ class CartListState extends State<CartList> {
           appBar: AppBar(
             title: Text('Carrito',
               style: TextStyle(fontFamily: 'Lobster',
-                  fontSize: 30),
+                  fontSize: 26),
             ),
             centerTitle: true,
             leading: IconButton(icon: Icon(Icons.arrow_back),

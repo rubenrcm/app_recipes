@@ -51,7 +51,7 @@ class RecipeListState extends State<RecipeList> {
 		    elevation: 1.0,
 		    title: Text('Recetas',
 										style: TextStyle(fontFamily: 'Lobster',
-																			fontSize: 30),
+																			fontSize: 26),
 				),
 				actions: <Widget>[
 					IconButton(
@@ -212,7 +212,7 @@ class _search_delegate extends SearchDelegate<String> {
 	@override
   ThemeData appBarTheme(BuildContext context) {
     return ThemeData(
-			primaryColor: Color(0xFFFDB35D),
+			primaryColor: Color(0xFFFFC078),
 			accentIconTheme: IconThemeData(color: Colors.white),
 			primaryIconTheme: IconThemeData(color: Colors.white),
 			textTheme: TextTheme(

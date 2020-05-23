@@ -45,9 +45,9 @@ class WeekListState extends State<WeekList> {
 	    appBar: AppBar(
 				centerTitle: true,
 		    elevation: 1.0,
-		    title: Text('Semana',
+		    title: Text('Plan Semanal',
 										style: TextStyle(fontFamily: 'Lobster',
-																			fontSize: 30),
+																			fontSize: 26),
 				),
 				leading: IconButton(icon: Icon(Icons.arrow_back),
 						onPressed: () {
@@ -72,13 +72,13 @@ class WeekListState extends State<WeekList> {
 			scrollDirection: Axis.horizontal,
 			physics: BouncingScrollPhysics(),
 			children: <Widget>[
-				dayCard(weekDays[0], 0xFFe94714, 0xFFda8859),
-				dayCard(weekDays[1], 0xFF92d56e, 0xFFcde345),
-				dayCard(weekDays[2], 0xFFa06bb9, 0xFFde6a9a),
-				dayCard(weekDays[3], 0xFF319fdd, 0xFF59d1d9),
-				dayCard(weekDays[4], 0xFFe2991d, 0xFFeece5b),
-				dayCard(weekDays[5], 0xFF32cd9a, 0xFF5bee9f),
-				dayCard(weekDays[6], 0xFFe75a5a, 0xFFbc79c2),
+				dayCard(weekDays[0], 0xFFFFC581, 0xFFFFD5A4),
+				dayCard(weekDays[1], 0xFFFDB35D, 0xFFFFC581),
+				dayCard(weekDays[2], 0xFFE59437, 0xFFFDB35D),
+				dayCard(weekDays[3], 0xFFE68649, 0xFFFDB35D),
+				dayCard(weekDays[4], 0xFFE68649, 0xFFE59437),
+				dayCard(weekDays[5], 0xFFE68649, 0xFFFF906B),
+				dayCard(weekDays[6], 0xFFFF906B, 0xFFFFC078),
 			],
 		);
   }
