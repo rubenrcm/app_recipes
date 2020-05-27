@@ -149,6 +149,10 @@ class RecipeDetailState extends State<RecipeDetail> {
 																	FaIcon(FontAwesomeIcons.user, size: 18, color: Colors.grey,),
 																	Container(width: 8.0),
 																	Text(recipe.servings.toString()),
+																	Container(width: 16.0),
+																	FaIcon(FontAwesomeIcons.burn, size: 18, color: Colors.grey,),
+																	Container(width: 8.0),
+																	Text(recipe.calories.toString()), Text(' Kcal'),
 																]
 														)
 												),

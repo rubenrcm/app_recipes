@@ -113,7 +113,7 @@ class RecipeListState extends State<RecipeList> {
 			floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 	    floatingActionButton: FloatingActionButton(
 		    onPressed: () {
-					navigateToAddNew(Recipe('', '', Duration(minutes:30), 1, null, '', '', null, PhotoColors.colors[new Random().nextInt(PhotoColors.colors.length)]), 'Nueva Receta');
+					navigateToAddNew(Recipe('', '', Duration(minutes:30), 1, null, '', '', null, PhotoColors.colors[new Random().nextInt(PhotoColors.colors.length)],0), 'Nueva Receta');
 		    },
 		    tooltip: 'Añade una receta',
 		    child: FaIcon(FontAwesomeIcons.utensils, size: 20,),

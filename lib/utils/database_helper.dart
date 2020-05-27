@@ -53,9 +53,9 @@ class DatabaseHelper {
 
 		// Open/create the database at a given path
 		var recipesDatabase = await openDatabase(path,
-				version: 1,
+				version: 2,
 				onCreate: _createDb,
-				onUpgrade: null // Here we can compare the version installed with the new version and
+				onUpgrade: _upgradeDb // Here we can compare the version installed with the new version and
 												// create the necessary things to match the new database
 		);
 		return recipesDatabase;
@@ -65,7 +65,7 @@ class DatabaseHelper {
 
 		await db.execute('CREATE TABLE $recipeTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, '
 				'$colDescription TEXT, $colDuration INTEGER, $colDate TEXT, $colServings INTEGER, $colCategory INTEGER, '
-				'$colSource TEXT, $colNotes TEXT, $colPhoto TEXT, background_color INTEGER, '
+				'$colSource TEXT, $colNotes TEXT, $colPhoto TEXT, background_color INTEGER, calories INTEGER, '
 				'FOREIGN KEY($colCategory) REFERENCES $categoryTable(id)'
 				'ON DELETE CASCADE)');
 
@@ -90,6 +90,12 @@ class DatabaseHelper {
 		Directory appDocDir = await getApplicationDocumentsDirectory();
 		new Directory(appDocDir.path+'/'+recipePhotosDir).create()
 				.then((Directory directory) {});
+	}
+
+	void _upgradeDb(Database db, int oldVersion, int newVersion) async {
+		if (newVersion == 2){
+			await db.execute('ALTER TABLE $recipeTable ADD COLUMN calories INTEGER');
+		}
 	}
 
 	// -- Recipes Operations --
