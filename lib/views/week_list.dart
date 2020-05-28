@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:recipes/models/catalogs.dart';
 import 'package:recipes/models/recipe.dart';
 import 'package:recipes/utils/database_helper.dart';
 import 'package:recipes/views/recipe_detail.dart';
@@ -22,16 +23,17 @@ class WeekList extends StatefulWidget {
 class WeekListState extends State<WeekList> {
 
 	DatabaseHelper databaseHelper = DatabaseHelper();
-	List<Recipe> recipeList;
-	int count = 0;
+	List<Days> daysList;
+	List<Meals> mealsList;
+	int dayscount = 7;
 	String query = '';
 	List<String> weekDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes','Sábado', 'Domingo'];
 
 	@override
   Widget build(BuildContext context) {
 
-		if (recipeList == null) {
-			recipeList = List<Recipe>();
+		if (daysList == null) {
+			daysList = List<Days>();
 			updateListView();
 		}
 
@@ -72,13 +74,14 @@ class WeekListState extends State<WeekList> {
 			scrollDirection: Axis.horizontal,
 			physics: BouncingScrollPhysics(),
 			children: <Widget>[
-				dayCard(weekDays[0], 0xFFFFC581, 0xFFFFD5A4),
-				dayCard(weekDays[1], 0xFFFDB35D, 0xFFFFC581),
-				dayCard(weekDays[2], 0xFFE59437, 0xFFFDB35D),
-				dayCard(weekDays[3], 0xFFE68649, 0xFFFDB35D),
-				dayCard(weekDays[4], 0xFFE68649, 0xFFE59437),
-				dayCard(weekDays[5], 0xFFE68649, 0xFFFF906B),
-				dayCard(weekDays[6], 0xFFFF906B, 0xFFFFC078),
+				//TODO: fix the error when the first time dayList is empty
+				dayCard(daysList[0].name_es ?? ' ', 0xFFFFC581, 0xFFFFD5A4), //This doesn't seem to fix it
+				dayCard(daysList != null ? daysList[1].name_es : ' ', 0xFFFDB35D, 0xFFFFC581), //This neither
+				dayCard(daysList != null ? daysList[2].name_es : ' ', 0xFFE59437, 0xFFFDB35D),
+				dayCard(daysList != null ? daysList[3].name_es : ' ', 0xFFE68649, 0xFFFDB35D),
+				dayCard(daysList != null ? daysList[4].name_es : ' ', 0xFFE68649, 0xFFE59437),
+				dayCard(daysList != null ? daysList[5].name_es : ' ', 0xFFE68649, 0xFFFF906B),
+				dayCard(daysList != null ? daysList[6].name_es : ' ', 0xFFFF906B, 0xFFFFC078),
 			],
 		);
   }
@@ -164,11 +167,17 @@ class WeekListState extends State<WeekList> {
   void updateListView() {
 		final Future<Database> dbFuture = databaseHelper.initializeDatabase();
 		dbFuture.then((database) {
-			Future<List<Recipe>> recipeListFuture = databaseHelper.getRecipeList();
-			recipeListFuture.then((recipeList) {
+			//TODO: optimize this in order to redraw only one time
+			Future<List<Days>> daysListFuture = databaseHelper.getDaysList();
+			Future<List<Meals>> daysMealsFuture = databaseHelper.getMealsList();
+			daysListFuture.then((daysList) {
 				setState(() {
-				  this.recipeList = recipeList;
-				  this.count = recipeList.length;
+				  this.daysList = daysList;
+				});
+			});
+			daysMealsFuture.then((mealsList) {
+				setState(() {
+					this.mealsList = mealsList;
 				});
 			});
 		});

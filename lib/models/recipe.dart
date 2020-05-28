@@ -232,7 +232,6 @@ class RecipeStep {
 }
 
 class Category {
-	//One2one relation with recipe
 
 	int _id;
 	int _recipe_id;

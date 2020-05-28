@@ -1,3 +1,4 @@
+import 'package:recipes/models/catalogs.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';
@@ -53,7 +54,7 @@ class DatabaseHelper {
 
 		// Open/create the database at a given path
 		var recipesDatabase = await openDatabase(path,
-				version: 2,
+				version: 3,
 				onCreate: _createDb,
 				onUpgrade: _upgradeDb // Here we can compare the version installed with the new version and
 												// create the necessary things to match the new database
@@ -86,6 +87,27 @@ class DatabaseHelper {
 		await db.execute('CREATE TABLE $cartTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, '
 				'qty REAL, qty_type TEXT, name TEXT, add_cart INTEGER, original_qty REAL, done INTEGER)');
 
+		await db.execute('CREATE TABLE days_catalog($colId INTEGER PRIMARY KEY, '
+				'name_en TEXT, name_es TEXT, name_it TEXT)');
+
+		// I'm sure that there is a better way to do this
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (1,"Lunes", "Monday", "Lunedì")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (2,"Martes", "Tuesday", "Martedí")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (3,"Miércoles", "Wednesday", "Mercoledì")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (4,"Jueves", "Thursday", "Giovedì")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (5,"Viernes", "Friday", "Venerdì")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (6,"Sábado", "Saturday", "Sabato")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (7,"Domingo", "Sunday", "Domenica")');
+
+		await db.execute('CREATE TABLE menus_catalog($colId INTEGER PRIMARY KEY, '
+				'name_en TEXT, name_es TEXT, name_it TEXT)');
+
+		await db.execute('INSERT INTO menus_catalog (id, name_es, name_en, name_it) VALUES (1,"Desayunp", "Breakfast", "Colazione")');
+		await db.execute('INSERT INTO menus_catalog (id, name_es, name_en, name_it) VALUES (2,"Almuerzo", " ", " ")');
+		await db.execute('INSERT INTO menus_catalog (id, name_es, name_en, name_it) VALUES (3,"Comida", "Launch", "Pranzo")');
+		await db.execute('INSERT INTO menus_catalog (id, name_es, name_en, name_it) VALUES (4,"Merienda", " ", " ")');
+		await db.execute('INSERT INTO menus_catalog (id, name_es, name_en, name_it) VALUES (5,"Cena", "Dinner", "Cena")');
+
 		// We also create here the directory where the images will be stored //Not used for now
 		Directory appDocDir = await getApplicationDocumentsDirectory();
 		new Directory(appDocDir.path+'/'+recipePhotosDir).create()
@@ -93,8 +115,29 @@ class DatabaseHelper {
 	}
 
 	void _upgradeDb(Database db, int oldVersion, int newVersion) async {
-		if (newVersion == 2){
+		if (newVersion == 3){
 			await db.execute('ALTER TABLE $recipeTable ADD COLUMN calories INTEGER');
+
+			// I'm sure that there is a better way to do this
+			await db.execute('CREATE TABLE days_catalog($colId INTEGER PRIMARY KEY, '
+					'name_en TEXT, name_es TEXT, name_it TEXT)');
+
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (1,"Lunes", "Monday", "Lunedì")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (2,"Martes", "Tuesday", "Martedí")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (3,"Miércoles", "Wednesday", "Mercoledì")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (4,"Jueves", "Thursday", "Giovedì")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (5,"Viernes", "Friday", "Venerdì")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (6,"Sábado", "Saturday", "Sabato")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (7,"Domingo", "Sunday", "Domenica")');
+
+			await db.execute('CREATE TABLE meals_catalog($colId INTEGER PRIMARY KEY, '
+					'name_en TEXT, name_es TEXT, name_it TEXT)');
+
+			await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (1,"Desayunp", "Breakfast", "Colazione")');
+			await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (2,"Almuerzo", " ", " ")');
+			await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (3,"Comida", "Launch", "Pranzo")');
+			await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (4,"Merienda", " ", " ")');
+			await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (5,"Cena", "Dinner", "Cena")');
 		}
 	}
 
@@ -303,6 +346,41 @@ class DatabaseHelper {
 		return result;
 	}
 
+	// -- Days operations --
+
+	Future<List<Map<String, dynamic>>> getDaysMapList() async {
+		Database db = await this.database;
+		var result = await db.query('days_catalog', orderBy: 'id ASC');
+		return result;
+	}
+
+	Future<List<Days>> getDaysList() async {
+		var daysMapList = await getDaysMapList();
+		int count = daysMapList.length;
+		List<Days> daysList = List<Days>();
+		for (int i = 0; i < count; i++) {
+			daysList.add(Days.fromMapObject(daysMapList[i]));
+		}
+		return daysList;
+	}
+
+	// -- Meals operations
+
+	Future<List<Map<String, dynamic>>> getMealsMapList() async {
+		Database db = await this.database;
+		var result = await db.query('meals_catalog', orderBy: 'id ASC');
+		return result;
+	}
+
+	Future<List<Meals>> getMealsList() async {
+		var mealsMapList = await getMealsMapList();
+		int count = mealsMapList.length;
+		List<Meals> mealsList = List<Meals>();
+		for (int i = 0; i < count; i++) {
+			mealsList.add(Meals.fromMapObject(mealsMapList[i]));
+		}
+		return mealsList;
+	}
 
 
 }
