@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recipes/models/catalogs.dart';
-import 'package:recipes/models/recipe.dart';
 import 'package:recipes/utils/database_helper.dart';
-import 'package:recipes/views/recipe_detail.dart';
+import 'package:recipes/views/week_day.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:recipes/views/cart_list.dart';
@@ -27,7 +26,7 @@ class WeekListState extends State<WeekList> {
 	List<Meals> mealsList;
 	int dayscount = 7;
 	String query = '';
-	List<String> weekDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes','Sábado', 'Domingo'];
+	List<List<String>> daysRecipes;
 
 	@override
   Widget build(BuildContext context) {
@@ -62,8 +61,8 @@ class WeekListState extends State<WeekList> {
 			floatingActionButton: FloatingActionButton(
 				onPressed: () {
 				},
-				tooltip: 'Añade la compra de la semana',
-				child: FaIcon(FontAwesomeIcons.shoppingCart, size: 20,),
+				tooltip: 'Vaciar semana',
+				child: FaIcon(FontAwesomeIcons.check, size: 20,),
 			),
 
     );
@@ -74,22 +73,24 @@ class WeekListState extends State<WeekList> {
 			scrollDirection: Axis.horizontal,
 			physics: BouncingScrollPhysics(),
 			children: <Widget>[
-				//TODO: fix the error when the first time dayList is empty
-				dayCard(daysList[0].name_es ?? ' ', 0xFFFFC581, 0xFFFFD5A4), //This doesn't seem to fix it
-				dayCard(daysList != null ? daysList[1].name_es : ' ', 0xFFFDB35D, 0xFFFFC581), //This neither
-				dayCard(daysList != null ? daysList[2].name_es : ' ', 0xFFE59437, 0xFFFDB35D),
-				dayCard(daysList != null ? daysList[3].name_es : ' ', 0xFFE68649, 0xFFFDB35D),
-				dayCard(daysList != null ? daysList[4].name_es : ' ', 0xFFE68649, 0xFFE59437),
-				dayCard(daysList != null ? daysList[5].name_es : ' ', 0xFFE68649, 0xFFFF906B),
-				dayCard(daysList != null ? daysList[6].name_es : ' ', 0xFFFF906B, 0xFFFFC078),
+				dayCard(daysList.length != 0 ? daysList[0].name_es : ' ',0, 0xFFFFC581, 0xFFFFD5A4),
+				dayCard(daysList.length != 0 ? daysList[1].name_es : ' ',1, 0xFFFDB35D, 0xFFFFC581),
+				dayCard(daysList.length != 0 ? daysList[2].name_es : ' ',2, 0xFFE59437, 0xFFFDB35D),
+				dayCard(daysList.length != 0 ? daysList[3].name_es : ' ',3, 0xFFE68649, 0xFFFDB35D),
+				dayCard(daysList.length != 0 ? daysList[4].name_es : ' ',4, 0xFFE68649, 0xFFE59437),
+				dayCard(daysList.length != 0 ? daysList[5].name_es : ' ',5, 0xFFE68649, 0xFFFF906B),
+				dayCard(daysList.length != 0 ? daysList[6].name_es : ' ',6, 0xFFFF906B, 0xFFFFC078),
 			],
 		);
   }
 
-  Widget dayCard(String name, int color1, int color2){
+  Widget dayCard(String name, int day_id, int color1, int color2){
 		return new GestureDetector(
 			onTap: (){
-				Fluttertoast.showToast(msg: name);
+				Future<List<int>> recipe_ids_future = databaseHelper.getMenuRecipesByDayList(day_id.toString());
+				recipe_ids_future.then((recipe_ids) {
+					navigateToDay(name, recipe_ids, day_id);
+				});
 			},
 			child: Container(
 				width: 300,
@@ -116,29 +117,7 @@ class WeekListState extends State<WeekList> {
 						children: <Widget>[
 							Text(name, style: TextStyle(color: Colors.white, fontSize: 40),),
 							SizedBox(height: 20,),
-							Text("Desayuno", style: TextStyle(color: Colors.white, fontSize: 16),),
-							Divider(color: Colors.white, endIndent: 40,),
-							Row(children: <Widget>[
-								FaIcon(FontAwesomeIcons.utensilSpoon, color: Colors.white, size: 12,),
-								SizedBox(width: 4,),
-								Text("Albóndigas en salsa", style: TextStyle(color: Colors.white)),
-							],),
-							SizedBox(height: 20,),
-							Text("Comida", style: TextStyle(color: Colors.white, fontSize: 16),),
-							Divider(color: Colors.white, endIndent: 40,),
-							Row(children: <Widget>[
-								FaIcon(FontAwesomeIcons.utensilSpoon, color: Colors.white, size: 12,),
-								SizedBox(width: 4,),
-								Text("Pollo bien asao", style: TextStyle(color: Colors.white)),
-							],),
-							SizedBox(height: 20,),
-							Text("Cena", style: TextStyle(color: Colors.white, fontSize: 16),),
-							Divider(color: Colors.white, endIndent: 40,),
-							Row(children: <Widget>[
-								FaIcon(FontAwesomeIcons.utensilSpoon, color: Colors.white, size: 12,),
-								SizedBox(width: 4,),
-								Text("Un yogurcito", style: TextStyle(color: Colors.white)),
-							],),
+							getDayRecipesList(day_id),
 						],
 					)
 				),
@@ -146,33 +125,51 @@ class WeekListState extends State<WeekList> {
 		);
 	}
 
-  void navigateToDay(Recipe recipe, String title) async {
+  void navigateToDay(String day, List<int> recipe_ids, int day_id) async {
 	  bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
-		  return RecipeDetail(recipe, title);
+		  return WeekDay(day, recipe_ids, day_id);
 	  }));
 	  if (result == true) {
 	  	updateListView();
 	  }
   }
 
-	void navigateToCart() async {
-		bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
-			return CartList();
-		}));
-		if (result == true) {
-			updateListView();
-		}
+	ListView getDayRecipesList(int day) {
+		return ListView.builder(
+			padding: EdgeInsets.all(8.0),
+			shrinkWrap: true,
+			physics: NeverScrollableScrollPhysics() ,
+			itemCount: daysRecipes.length != 0 ? this.daysRecipes[day].length : 0,
+			itemBuilder: (BuildContext context, int position) {
+				return Container(
+					height: 30,
+					child:Row(children: <Widget>[
+						FaIcon(FontAwesomeIcons.utensilSpoon, size: 12, color: Colors.white),
+						SizedBox(width: 4,),
+						Text(this.daysRecipes[day][position], style: TextStyle(color: Colors.white)),
+					],) ,
+				);
+			},
+		);
 	}
 
   void updateListView() {
 		final Future<Database> dbFuture = databaseHelper.initializeDatabase();
 		dbFuture.then((database) {
-			//TODO: optimize this in order to redraw only one time
+			//TODO: optimize this in order to redraw only one time, this is a bit of a mess
 			Future<List<Days>> daysListFuture = databaseHelper.getDaysList();
 			Future<List<Meals>> daysMealsFuture = databaseHelper.getMealsList();
 			daysListFuture.then((daysList) {
 				setState(() {
 				  this.daysList = daysList;
+				  var daysRecipeList = List<List<String>>();
+				  for (var d = 0; d < 7; d++){
+						Future<List<String>> recipeListFuture = databaseHelper.getRecipeNamesByDayId(d);
+						recipeListFuture.then((recipeList) {
+							daysRecipeList.add(recipeList);
+						});
+					}
+					this.daysRecipes = daysRecipeList;
 				});
 			});
 			daysMealsFuture.then((mealsList) {

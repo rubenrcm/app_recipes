@@ -30,7 +30,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_duration_picker: ^1.0.4
-  flutter_iconpicker: any
   gallery_saver: any
 
 dev_dependencies:
