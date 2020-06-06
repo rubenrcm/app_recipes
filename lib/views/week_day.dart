@@ -5,7 +5,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recipes/models/recipe.dart';
 import 'package:recipes/utils/database_helper.dart';
 import 'package:recipes/views/recipe_detail.dart';
-import 'package:recipes/views/recipe_row.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -49,39 +48,42 @@ class WeekDayState extends State<WeekDay> {
 				statusBarColor: Theme.of(context).primaryColor
 		));
 
-    return Scaffold(
-			backgroundColor: Colors.white,
-
-	    appBar: AppBar(
-				centerTitle: true,
-		    elevation: 1.0,
-		    title: Text(appBarTitle,
-										style: TextStyle(fontFamily: 'Lobster', fontSize: 26),
+    return WillPopScope(
+			onWillPop: () {
+				// This function executes when the navbar back button is pressed
+				moveToLastScreen();
+			},
+			child: Scaffold(
+				backgroundColor: Colors.white,
+				appBar: AppBar(
+					centerTitle: true,
+					elevation: 1.0,
+					title: Text(appBarTitle,
+						style: TextStyle(fontFamily: 'Lobster', fontSize: 26),
+					),
+					leading: IconButton(icon: Icon(Icons.arrow_back),
+							onPressed: () {
+								moveToLastScreen();
+							}
+					),
 				),
-				leading: IconButton(icon: Icon(Icons.arrow_back),
-						onPressed: () {
-							moveToLastScreen();
+				body: getRecipeListView(),
+				floatingActionButton: FloatingActionButton(
+					onPressed: () async {
+						final String selected = await showSearch(context: context, delegate: _search_delegate(recipeList, day_id));
+						if (selected != null && selected != query) {
+							setState(() {
+								query = selected;
+								recipe_ids.add(int.parse(selected));
+							});
 						}
+						updateListView();
+					},
+					tooltip: 'Añade una receta',
+					child: FaIcon(FontAwesomeIcons.plus, size: 20,),
 				),
-	    ),
-
-	    body: getRecipeListView(),
-			floatingActionButton: FloatingActionButton(
-				onPressed: () async {
-					final String selected = await showSearch(context: context, delegate: _search_delegate(recipeList, day_id));
-					if (selected != null && selected != query) {
-						setState(() {
-							query = selected;
-							recipe_ids.add(int.parse(selected));
-						});
-					}
-					updateListView();
-				},
-				tooltip: 'Añade una receta',
-				child: FaIcon(FontAwesomeIcons.plus, size: 20,),
 			),
-
-    );
+		);
   }
 
 	Widget getRecipeListView() {
@@ -231,7 +233,7 @@ class _search_delegate extends SearchDelegate<String> {
 				itemCount: recipeList.length,
 				itemBuilder: (BuildContext context, int index) {
 					return new ListTile(
-						leading: FaIcon(FontAwesomeIcons.utensilSpoon, size: 16, color: Colors.grey,),
+						leading: FaIcon(FontAwesomeIcons.utensilSpoon, size: 16, color: Theme.of(context).accentColor,),
 						title: Text(recipeList[index].name),
 						onTap: () async {
 							databaseHelper.insertRecipeToDay(day_id.toString(),0.toString(),recipeList[index].id.toString());
@@ -251,7 +253,7 @@ class _search_delegate extends SearchDelegate<String> {
 				itemCount: recipeList.length,
 				itemBuilder: (BuildContext context, int index) {
 					return new ListTile(
-						leading: FaIcon(FontAwesomeIcons.utensilSpoon, size: 16, color: Colors.blue,),
+						leading: FaIcon(FontAwesomeIcons.utensilSpoon, size: 16, color: Theme.of(context).accentColor,),
 						title: Text(recipeList[index].name),
 						onTap: () async {
 							databaseHelper.insertRecipeToDay(day_id.toString(),0.toString(),recipeList[index].id.toString());

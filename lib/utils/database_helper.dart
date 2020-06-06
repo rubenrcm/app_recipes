@@ -459,17 +459,27 @@ class DatabaseHelper {
 		return result;
 	}
 
-	Future<List<String>> getRecipeNamesByDayId(int id) async {
-		var recipesList = await getMenuRecipesByDayList(id.toString());
-		var recipeMapList = await getRecipeMapListById(recipesList);
-		int count = recipeMapList.length;
-		List<String> recipeList = List<String>();
-		for (int i = 0; i < count; i++) {
-			recipeList.add(Recipe.fromMapObject(recipeMapList[i]).name);
+	Future<List<List<String>>> getRecipesDaysList() async {
+		List<List<String>> recipeDayList = List<List<String>>();
+		for(int d = 0; d < 7; d++){
+			var recipesList = await getMenuRecipesByDayList(d.toString());
+			var recipeMapList = await getRecipeMapListById(recipesList);
+			int count = recipeMapList.length;
+			List<String> recipeList = List<String>();
+			for (int i = 0; i < count; i++) {
+				recipeList.add(Recipe.fromMapObject(recipeMapList[i]).name);
+			}
+			recipeDayList.add(recipeList);
 		}
-		return recipeList;
+		return recipeDayList;
 	}
 
+
+	Future<int> deleteWeekRecipes() async {
+		var db = await this.database;
+		int result = await db.rawDelete('DELETE FROM menu_recipe');
+		return result;
+	}
 
 }
 

@@ -7,7 +7,6 @@ import 'package:recipes/utils/database_helper.dart';
 import 'package:recipes/views/week_day.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:recipes/views/cart_list.dart';
 
 
 class WeekList extends StatefulWidget {
@@ -60,9 +59,32 @@ class WeekListState extends State<WeekList> {
 	    body: getWeekDaysView(),
 			floatingActionButton: FloatingActionButton(
 				onPressed: () {
+					AlertDialog alertDialog = AlertDialog(
+						title: Text(
+							'Se borrarán las recetas de la semana',
+							textAlign: TextAlign.center,
+							style: TextStyle(color: Colors.black45),
+						),
+						content:
+								FlatButton(
+									onPressed: () async {
+										_deleteWeek();
+									},
+									shape: RoundedRectangleBorder(
+											borderRadius: BorderRadius.circular(40)
+									),
+									child: Text("Ok", style: TextStyle(color: Colors.white),),
+									color: Theme.of(context).primaryColor,
+								)
+
+					);
+					showDialog(
+							context: context,
+							builder: (_) => alertDialog
+					);
 				},
 				tooltip: 'Vaciar semana',
-				child: FaIcon(FontAwesomeIcons.check, size: 20,),
+				child: FaIcon(FontAwesomeIcons.redoAlt, size: 20,),
 			),
 
     );
@@ -139,14 +161,14 @@ class WeekListState extends State<WeekList> {
 			padding: EdgeInsets.all(8.0),
 			shrinkWrap: true,
 			physics: NeverScrollableScrollPhysics() ,
-			itemCount: daysRecipes.length != 0 ? this.daysRecipes[day].length : 0,
+			itemCount: (daysRecipes != null) ? this.daysRecipes[day].length : 0,
 			itemBuilder: (BuildContext context, int position) {
 				return Container(
 					height: 30,
 					child:Row(children: <Widget>[
-						FaIcon(FontAwesomeIcons.utensilSpoon, size: 12, color: Colors.white),
-						SizedBox(width: 4,),
-						Text(this.daysRecipes[day][position], style: TextStyle(color: Colors.white)),
+						FaIcon(FontAwesomeIcons.utensilSpoon, size: 16, color: Colors.white),
+						SizedBox(width: 10,),
+						Text(this.daysRecipes[day][position], style: TextStyle(color: Colors.white, fontSize: 16)),
 					],) ,
 				);
 			},
@@ -156,20 +178,13 @@ class WeekListState extends State<WeekList> {
   void updateListView() {
 		final Future<Database> dbFuture = databaseHelper.initializeDatabase();
 		dbFuture.then((database) {
-			//TODO: optimize this in order to redraw only one time, this is a bit of a mess
 			Future<List<Days>> daysListFuture = databaseHelper.getDaysList();
 			Future<List<Meals>> daysMealsFuture = databaseHelper.getMealsList();
+			Future<List<List<String>>> daysRecipesFuture = databaseHelper.getRecipesDaysList();
+
 			daysListFuture.then((daysList) {
 				setState(() {
 				  this.daysList = daysList;
-				  var daysRecipeList = List<List<String>>();
-				  for (var d = 0; d < 7; d++){
-						Future<List<String>> recipeListFuture = databaseHelper.getRecipeNamesByDayId(d);
-						recipeListFuture.then((recipeList) {
-							daysRecipeList.add(recipeList);
-						});
-					}
-					this.daysRecipes = daysRecipeList;
 				});
 			});
 			daysMealsFuture.then((mealsList) {
@@ -177,8 +192,25 @@ class WeekListState extends State<WeekList> {
 					this.mealsList = mealsList;
 				});
 			});
+			daysRecipesFuture.then((daysRecipes) {
+				setState(() {
+					this.daysRecipes = daysRecipes;
+				});
+			});
 		});
   }
+
+	void _deleteWeek() async {
+
+		int result = await databaseHelper.deleteWeekRecipes();
+
+		if (result != 0) {
+			Fluttertoast.showToast(msg: 'Se ha vaciado la semana');
+		} else {
+			Fluttertoast.showToast(msg: 'No había recetas que borrar');
+		}
+		updateListView();
+	}
 
 	void moveToLastScreen() {
 		Navigator.pop(context, true);
