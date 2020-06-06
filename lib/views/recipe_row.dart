@@ -8,7 +8,6 @@ import 'package:recipes/views/recipe_detail.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io';
 
-
 class RecipeRow extends StatelessWidget {
 
   final Recipe recipe;

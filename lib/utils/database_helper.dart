@@ -54,7 +54,7 @@ class DatabaseHelper {
 
 		// Open/create the database at a given path
 		var recipesDatabase = await openDatabase(path,
-				version: 4,
+				version: 2,
 				onCreate: _createDb,
 				onUpgrade: _upgradeDb // Here we can compare the version installed with the new version and
 												// create the necessary things to match the new database

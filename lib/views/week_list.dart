@@ -8,7 +8,6 @@ import 'package:recipes/views/week_day.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
 class WeekList extends StatefulWidget {
 
 	@override
@@ -16,7 +15,6 @@ class WeekList extends StatefulWidget {
     return WeekListState();
   }
 }
-
 
 class WeekListState extends State<WeekList> {
 

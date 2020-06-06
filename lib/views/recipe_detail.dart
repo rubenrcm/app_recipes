@@ -9,7 +9,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:recipes/views/recipe_detail_edit.dart';
 import 'package:recipes/models/menu_list.dart';
 import 'dart:io';
-
 import 'cart_list_from_recipe.dart';
 
 class RecipeDetail extends StatefulWidget {

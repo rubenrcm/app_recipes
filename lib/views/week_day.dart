@@ -8,7 +8,6 @@ import 'package:recipes/views/recipe_detail.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
 class WeekDay extends StatefulWidget {
 
 	final String appBarTitle;
