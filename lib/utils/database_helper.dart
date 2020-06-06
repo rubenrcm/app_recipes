@@ -91,13 +91,13 @@ class DatabaseHelper {
 				'name_en TEXT, name_es TEXT, name_it TEXT)');
 
 		// I'm sure that there is a better way to do this
-		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (1,"Lunes", "Monday", "Lunedì")');
-		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (2,"Martes", "Tuesday", "Martedí")');
-		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (3,"Miércoles", "Wednesday", "Mercoledì")');
-		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (4,"Jueves", "Thursday", "Giovedì")');
-		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (5,"Viernes", "Friday", "Venerdì")');
-		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (6,"Sábado", "Saturday", "Sabato")');
-		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (7,"Domingo", "Sunday", "Domenica")');
+		await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (1,"Lunes", "Monday", "Lunedì")');
+		await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (2,"Martes", "Tuesday", "Martedí")');
+		await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (3,"Miércoles", "Wednesday", "Mercoledì")');
+		await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (4,"Jueves", "Thursday", "Giovedì")');
+		await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (5,"Viernes", "Friday", "Venerdì")');
+		await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (6,"Sábado", "Saturday", "Sabato")');
+		await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (7,"Domingo", "Sunday", "Domenica")');
 
 		await db.execute('CREATE TABLE meals_catalog($colId INTEGER PRIMARY KEY, '
 				'name_en TEXT, name_es TEXT, name_it TEXT)');
