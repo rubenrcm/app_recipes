@@ -6,6 +6,7 @@ import 'package:recipes/models/photo_colors.dart';
 import 'package:recipes/models/recipe.dart';
 import 'package:recipes/utils/database_helper.dart';
 import 'package:recipes/views/recipe_detail.dart';
+import 'package:recipes/views/week_list.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:recipes/views/recipe_detail_edit.dart';
@@ -50,7 +51,7 @@ class RecipeListState extends State<RecipeList> {
 		    elevation: 1.0,
 		    title: Text('Recetas',
 										style: TextStyle(fontFamily: 'Lobster',
-																			fontSize: 30),
+																			fontSize: 26),
 				),
 				actions: <Widget>[
 					IconButton(
@@ -91,12 +92,12 @@ class RecipeListState extends State<RecipeList> {
 
 							IconButton(
 								icon: FaIcon(
-									FontAwesomeIcons.tag,
+									FontAwesomeIcons.calendarDay,
 									size: 20.0,
 									color: Colors.black26,
 								),
 								onPressed: () {
-									Fluttertoast.showToast(msg: 'Coming soon');
+									navigateToWeek();
 								},
 							),
 
@@ -112,7 +113,7 @@ class RecipeListState extends State<RecipeList> {
 			floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 	    floatingActionButton: FloatingActionButton(
 		    onPressed: () {
-					navigateToAddNew(Recipe('', '', Duration(minutes:30), 1, null, '', '', null, PhotoColors.colors[new Random().nextInt(PhotoColors.colors.length)]), 'Nueva Receta');
+					navigateToAddNew(Recipe('', '', Duration(minutes:30), 1, null, '', '', null, PhotoColors.colors[new Random().nextInt(PhotoColors.colors.length)],0), 'Nueva Receta');
 		    },
 		    tooltip: 'Añade una receta',
 		    child: FaIcon(FontAwesomeIcons.utensils, size: 20,),
@@ -168,6 +169,15 @@ class RecipeListState extends State<RecipeList> {
 		}
 	}
 
+	void navigateToWeek() async {
+		bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+			return WeekList();
+		}));
+		if (result == true) {
+			updateListView();
+		}
+	}
+
 	void navigateToAddNew(Recipe recipe, String title) async {
 		bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
 			return RecipeDetailEdit(recipe, title);
@@ -202,7 +212,7 @@ class _search_delegate extends SearchDelegate<String> {
 	@override
   ThemeData appBarTheme(BuildContext context) {
     return ThemeData(
-			primaryColor: Color(0xFFFDB35D),
+			primaryColor: Color(0xFFFFC078),
 			accentIconTheme: IconThemeData(color: Colors.white),
 			primaryIconTheme: IconThemeData(color: Colors.white),
 			textTheme: TextTheme(

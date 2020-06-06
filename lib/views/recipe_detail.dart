@@ -9,7 +9,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:recipes/views/recipe_detail_edit.dart';
 import 'package:recipes/models/menu_list.dart';
 import 'dart:io';
-
 import 'cart_list_from_recipe.dart';
 
 class RecipeDetail extends StatefulWidget {
@@ -149,6 +148,10 @@ class RecipeDetailState extends State<RecipeDetail> {
 																	FaIcon(FontAwesomeIcons.user, size: 18, color: Colors.grey,),
 																	Container(width: 8.0),
 																	Text(recipe.servings.toString()),
+																	Container(width: 16.0),
+																	FaIcon(FontAwesomeIcons.burn, size: 18, color: Colors.grey,),
+																	Container(width: 8.0),
+																	Text(recipe.calories.toString()), Text(' Kcal'),
 																]
 														)
 												),

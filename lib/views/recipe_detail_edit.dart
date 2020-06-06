@@ -46,6 +46,7 @@ class RecipeDetailState extends State<RecipeDetailEdit> {
 	TextEditingController servingsController = TextEditingController();
 	TextEditingController sourceController = TextEditingController();
 	TextEditingController notesController = TextEditingController();
+	TextEditingController caloriesController = TextEditingController();
 
 	RecipeDetailState(this.recipe, this.appBarTitle);
 
@@ -58,6 +59,7 @@ class RecipeDetailState extends State<RecipeDetailEdit> {
 		descriptionController.text = recipe.description;
 		durationController.text = recipe.duration.toString().split(':')[0] + 'h ' + recipe.duration.toString().split(':')[1] + 'm';
 		servingsController.text = recipe.servings.toString();
+		caloriesController.text = recipe.calories.toString();
 		sourceController.text = recipe.source;
 		notesController.text = recipe.notes;
 		recipePhoto = recipe.photo_path == null ? null : File(recipe.photo_path);
@@ -218,6 +220,27 @@ class RecipeDetailState extends State<RecipeDetailEdit> {
 										decoration: InputDecoration(
 												labelText: 'Personas',
 												icon: FaIcon(FontAwesomeIcons.user, size: 20,),
+												//labelStyle: textStyle,
+												border: OutlineInputBorder(
+														borderRadius: BorderRadius.circular(8.0)
+												)
+										),
+									),
+								),
+								Container(width: 10.0,),
+								Expanded(
+									child: TextField(
+										controller: caloriesController,
+										keyboardType: TextInputType.numberWithOptions(),
+										inputFormatters: <TextInputFormatter>[
+											WhitelistingTextInputFormatter.digitsOnly
+										],
+										onChanged: (value) {
+											updateCalories();
+										},
+										decoration: InputDecoration(
+												labelText: 'Calorías',
+												icon: FaIcon(FontAwesomeIcons.burn, size: 20,),
 												//labelStyle: textStyle,
 												border: OutlineInputBorder(
 														borderRadius: BorderRadius.circular(8.0)
@@ -397,6 +420,10 @@ class RecipeDetailState extends State<RecipeDetailEdit> {
 
 	void updateNotes() {
 		recipe.notes = notesController.text;
+	}
+
+	void updateCalories() {
+		recipe.calories = int.parse(caloriesController.text);
 	}
 
 	void _save(bool showToast) async {

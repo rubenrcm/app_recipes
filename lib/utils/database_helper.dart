@@ -1,3 +1,4 @@
+import 'package:recipes/models/catalogs.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';
@@ -53,9 +54,9 @@ class DatabaseHelper {
 
 		// Open/create the database at a given path
 		var recipesDatabase = await openDatabase(path,
-				version: 1,
+				version: 2,
 				onCreate: _createDb,
-				onUpgrade: null // Here we can compare the version installed with the new version and
+				onUpgrade: _upgradeDb // Here we can compare the version installed with the new version and
 												// create the necessary things to match the new database
 		);
 		return recipesDatabase;
@@ -65,7 +66,7 @@ class DatabaseHelper {
 
 		await db.execute('CREATE TABLE $recipeTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, '
 				'$colDescription TEXT, $colDuration INTEGER, $colDate TEXT, $colServings INTEGER, $colCategory INTEGER, '
-				'$colSource TEXT, $colNotes TEXT, $colPhoto TEXT, background_color INTEGER, '
+				'$colSource TEXT, $colNotes TEXT, $colPhoto TEXT, background_color INTEGER, calories INTEGER, '
 				'FOREIGN KEY($colCategory) REFERENCES $categoryTable(id)'
 				'ON DELETE CASCADE)');
 
@@ -86,10 +87,61 @@ class DatabaseHelper {
 		await db.execute('CREATE TABLE $cartTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, '
 				'qty REAL, qty_type TEXT, name TEXT, add_cart INTEGER, original_qty REAL, done INTEGER)');
 
+		await db.execute('CREATE TABLE days_catalog($colId INTEGER PRIMARY KEY, '
+				'name_en TEXT, name_es TEXT, name_it TEXT)');
+
+		// I'm sure that there is a better way to do this
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (1,"Lunes", "Monday", "Lunedì")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (2,"Martes", "Tuesday", "Martedí")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (3,"Miércoles", "Wednesday", "Mercoledì")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (4,"Jueves", "Thursday", "Giovedì")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (5,"Viernes", "Friday", "Venerdì")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (6,"Sábado", "Saturday", "Sabato")');
+		await db.execute('INSERT INTO days_catalog (id, name_en, name_es, name_it) VALUES (7,"Domingo", "Sunday", "Domenica")');
+
+		await db.execute('CREATE TABLE meals_catalog($colId INTEGER PRIMARY KEY, '
+				'name_en TEXT, name_es TEXT, name_it TEXT)');
+
+		await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (1,"Desayunp", "Breakfast", "Colazione")');
+		await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (2,"Almuerzo", " ", " ")');
+		await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (3,"Comida", "Launch", "Pranzo")');
+		await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (4,"Merienda", " ", " ")');
+		await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (5,"Cena", "Dinner", "Cena")');
+
+		await db.execute('CREATE TABLE menu_recipe(day_id INTEGER, meal_id INTEGER, recipe_id INTEGER, FOREIGN KEY(recipe_id) REFERENCES $recipeTable(id) ON DELETE CASCADE)');
+
 		// We also create here the directory where the images will be stored //Not used for now
 		Directory appDocDir = await getApplicationDocumentsDirectory();
 		new Directory(appDocDir.path+'/'+recipePhotosDir).create()
 				.then((Directory directory) {});
+	}
+
+	void _upgradeDb(Database db, int oldVersion, int newVersion) async {
+		if (newVersion == 2){
+			await db.execute('ALTER TABLE $recipeTable ADD COLUMN calories INTEGER');
+
+			 //I'm sure that there is a better way to do this
+			await db.execute('CREATE TABLE days_catalog($colId INTEGER PRIMARY KEY, '
+					'name_en TEXT, name_es TEXT, name_it TEXT)');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (1,"Lunes", "Monday", "Lunedì")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (2,"Martes", "Tuesday", "Martedí")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (3,"Miércoles", "Wednesday", "Mercoledì")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (4,"Jueves", "Thursday", "Giovedì")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (5,"Viernes", "Friday", "Venerdì")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (6,"Sábado", "Saturday", "Sabato")');
+			await db.execute('INSERT INTO days_catalog (id, name_es, name_en, name_it) VALUES (7,"Domingo", "Sunday", "Domenica")');
+
+			await db.execute('CREATE TABLE meals_catalog($colId INTEGER PRIMARY KEY, '
+					'name_en TEXT, name_es TEXT, name_it TEXT)');
+
+			await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (1,"Desayunp", "Breakfast", "Colazione")');
+			await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (2,"Almuerzo", " ", " ")');
+			await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (3,"Comida", "Launch", "Pranzo")');
+			await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (4,"Merienda", " ", " ")');
+			await db.execute('INSERT INTO meals_catalog (id, name_es, name_en, name_it) VALUES (5,"Cena", "Dinner", "Cena")');
+
+			await db.execute('CREATE TABLE menu_recipe(day_id INTEGER, meal_id INTEGER, recipe_id INTEGER, FOREIGN KEY(recipe_id) REFERENCES $recipeTable(id) ON DELETE CASCADE)');
+		}
 	}
 
 	// -- Recipes Operations --
@@ -103,6 +155,13 @@ class DatabaseHelper {
 	Future<List<Map<String, dynamic>>> getRecipeMapListFiltered(String filter) async {
 		Database db = await this.database;
 		var result = await db.query(recipeTable, where: 'title like "%$filter%"', orderBy: 'id ASC');
+		return result;
+	}
+
+	Future<List<Map<String, dynamic>>> getRecipeMapListById(List<int> ids) async {
+		Database db = await this.database;
+		String ids_str = ids.toString().substring(1,ids.toString().length-1);
+		var result = await db.query(recipeTable, where: 'id IN ($ids_str)');
 		return result;
 	}
 
@@ -147,6 +206,26 @@ class DatabaseHelper {
 		List<Recipe> recipeList = List<Recipe>();
 		for (int i = 0; i < count; i++) {
 			recipeList.add(Recipe.fromMapObject(recipeMapList[i]));
+		}
+		return recipeList;
+	}
+
+	Future<List<Recipe>> getRecipeListById(List<int> ids) async {
+		var recipeMapList = await getRecipeMapListById(ids);
+		int count = recipeMapList.length;
+		List<Recipe> recipeList = List<Recipe>();
+		for (int i = 0; i < count; i++) {
+			recipeList.add(Recipe.fromMapObject(recipeMapList[i]));
+		}
+		return recipeList;
+	}
+
+	Future<List<String>> getRecipeNamesById(List<int> ids) async {
+		var recipeMapList = await getRecipeMapListById(ids);
+		int count = recipeMapList.length;
+		List<String> recipeList = List<String>();
+		for (int i = 0; i < count; i++) {
+			recipeList.add(Recipe.fromMapObject(recipeMapList[i]).name);
 		}
 		return recipeList;
 	}
@@ -297,7 +376,110 @@ class DatabaseHelper {
 		return result;
 	}
 
+	// -- Days operations --
 
+	Future<List<Map<String, dynamic>>> getDaysMapList() async {
+		Database db = await this.database;
+		var result = await db.query('days_catalog', orderBy: 'id ASC');
+		return result;
+	}
+
+	Future<List<Days>> getDaysList() async {
+		var daysMapList = await getDaysMapList();
+		int count = daysMapList.length;
+		List<Days> daysList = List<Days>();
+		for (int i = 0; i < count; i++) {
+			daysList.add(Days.fromMapObject(daysMapList[i]));
+		}
+		return daysList;
+	}
+
+	// -- Meals operations
+
+	Future<List<Map<String, dynamic>>> getMealsMapList() async {
+		Database db = await this.database;
+		var result = await db.query('meals_catalog', orderBy: 'id ASC');
+		return result;
+	}
+
+	Future<List<Meals>> getMealsList() async {
+		var mealsMapList = await getMealsMapList();
+		int count = mealsMapList.length;
+		List<Meals> mealsList = List<Meals>();
+		for (int i = 0; i < count; i++) {
+			mealsList.add(Meals.fromMapObject(mealsMapList[i]));
+		}
+		return mealsList;
+	}
+
+	// -- Meals operations
+
+	Future<List<Map<String, dynamic>>> getMenuRecipesMapList() async {
+		Database db = await this.database;
+		var result = await db.query('menu_recipe', orderBy: 'day_id ASC, meal_id ASC');
+		return result;
+	}
+
+	Future<List<List<int>>> getMenuRecipesList() async {
+		var menuMapList = await getMenuRecipesMapList();
+		int count = menuMapList.length;
+		List<List<int>> menuList = List<List<int>>();
+		for (int i = 0; i < count; i++) {
+			menuList.add([menuMapList[i][0],menuMapList[i][1],menuMapList[i][2]]);
+		}
+		return menuList;
+	}
+
+	Future<List<Map<String, dynamic>>> getMenuRecipesByDayMapList(String day_id) async {
+		Database db = await this.database;
+		var result = await db.query('menu_recipe', where:'day_id = $day_id');
+		return result;
+	}
+
+	Future<List<int>> getMenuRecipesByDayList(String day_id) async {
+		var recipesList = await getMenuRecipesByDayMapList(day_id);
+		int count = recipesList.length;
+		List<int> recipe_ids = List<int>();
+		for (int i = 0; i < count; i++) {
+			recipe_ids.add(recipesList[i]['recipe_id']);
+		}
+		return recipe_ids;
+	}
+
+	Future<int> insertRecipeToDay(String day_id, String meal_id, String recipe_id) async {
+		Database db = await this.database;
+		var result = await db.rawInsert('INSERT INTO menu_recipe(day_id, meal_id, recipe_id) VALUES(?, ?, ?)',
+				[day_id, meal_id,recipe_id]);
+		return result;
+	}
+
+	Future<int> deleteDayRecipe(int id, int recipe) async {
+		var db = await this.database;
+		int result = await db.rawDelete('DELETE FROM menu_recipe WHERE day_id = $id and recipe_id = $recipe');
+		return result;
+	}
+
+	Future<List<List<String>>> getRecipesDaysList() async {
+		List<List<String>> recipeDayList = List<List<String>>();
+		for(int d = 0; d < 7; d++){
+			var recipesList = await getMenuRecipesByDayList(d.toString());
+			var recipeMapList = await getRecipeMapListById(recipesList);
+			int count = recipeMapList.length;
+			List<String> recipeList = List<String>();
+			for (int i = 0; i < count; i++) {
+				recipeList.add(Recipe.fromMapObject(recipeMapList[i]).name);
+			}
+			recipeDayList.add(recipeList);
+		}
+		return recipeDayList;
+	}
+
+
+	Future<int> deleteWeekRecipes() async {
+		var db = await this.database;
+		int result = await db.rawDelete('DELETE FROM menu_recipe');
+		return result;
+	}
 
 }
 
